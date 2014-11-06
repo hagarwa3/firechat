@@ -9,8 +9,8 @@
   <meta name="author" content="Rob DiMarco, Engineer @ Firebase, rob@firebase.com">
   <meta name="description" content="Open source, real-time chat built on Firebase." />
 
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap-responsive.min.css" />
   <link rel="stylesheet" href="./css/pygments-borland.css" />
   <link rel="stylesheet" href="./css/styles.css" />
   <link href="images/favicon.ico" rel="shortcut icon" />
@@ -174,14 +174,13 @@
   </div>
 
   <!-- Firechat -->
-  <script src="https://cdn.firebase.com/js/client/1.0.21/firebase.js"></script>
-  <script src="https://cdn.firebase.com/js/simple-login/1.6.3/firebase-simple-login.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+  <script src="https://cdn.firebase.com/js/client/2.0.2/firebase.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap-modal.min.js"></script>
 
   <!-- Download from https://github.com/firebase/Firechat -->
-  <link rel="stylesheet" href="firechat/1.0.0/firechat-default.css" />
-  <script src="firechat/1.0.0/firechat-default.js"></script>
+  <link rel="stylesheet" href="firechat/2.0.0/firechat-default.css" />
+  <script src="firechat/2.0.0/firechat-default.js"></script>
   <script>
     var chatRef = new Firebase('https://firechat-demo.firebaseio.com'),
         target = document.getElementById("firechat-container"),
@@ -193,12 +192,12 @@
       return false;
     });
 
-    var auth = new FirebaseSimpleLogin(chatRef, function(error, user) {
-      if (user) {
-        var userId = user.id,
-            username = user.displayName;
+    chatRef.onAuth(function(authData) {
+      if (authData) {
+        var userId = authData.uid,
+            username = authData[authData.provider].displayName;
 
-        chat.setUser(user.id, username);
+        chat.setUser(userId, username);
         $('#user-name').text(username);
         $('#user-info').show();
         setTimeout(function() {
@@ -212,11 +211,15 @@
 
     function login(provider) {
       authModal.modal('hide');
-      auth.login(provider);
+      chatRef.authWithOAuthPopup(provider, function(error, authData) {
+        if (error) {
+          console.log(error);
+        }
+      });
     }
 
     function logout() {
-      auth.logout();
+      chatRef.unauth();
       location.reload();
     }
   </script>

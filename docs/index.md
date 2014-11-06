@@ -23,7 +23,7 @@ Before getting started, you'll need to:
 - [Download Firechat](https://github.com/firebase/firechat/releases/latest)
 - Include [jQuery](http://jquery.com/) (v1.7 or later)
 
-Lastly, ***Firechat requires an authenticated Firebase reference***. Firebase supports authenticate with either your own custom authentication system or a number of built-in providers (more on this below).
+Lastly, ***Firechat requires an authenticated Firebase reference***. Firebase supports authentication with either your own custom authentication system or a number of built-in providers (more on this below).
 
 Let's put it all together, using Twitter authentication in our example:
 
@@ -32,9 +32,8 @@ Let's put it all together, using Twitter authentication in our example:
 <html>
   <head>
     <meta charset='utf-8' />
-    <script src='https://cdn.firebase.com/js/client/1.0.21/firebase.js'></script>
-    <script src='https://cdn.firebase.com/js/simple-login/1.6.3/firebase-simple-login.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.2/jquery.min.js'></script>
+    <script src='https://cdn.firebase.com/js/client/2.0.2/firebase.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
 
     <!-- Download from https://github.com/firebase/firechat -->
     <link rel='stylesheet' href='firechat-default.css' />
@@ -44,16 +43,23 @@ Let's put it all together, using Twitter authentication in our example:
     <script type='text/javascript'>
       // Create a new Firebase reference, and a new instance of the Login client
       var chatRef = new Firebase('https://<YOUR-FIREBASE>.firebaseio.com/chat');
-      var auth = new FirebaseSimpleLogin(chatRef, function(err, user) {
+      chatRef.onAuth(function(authData) {
         // Once authenticated, instantiate Firechat with our user id and user name
-        if (user) {
+        if (authData) {
           var chat = new FirechatUI(chatRef, document.getElementById('firechat-wrapper'));
-          chat.setUser(user.uid, user.displayName);
+          chat.setUser(authData.uid, authData[authData.provider].displayName);
         }
       });
+      function login(provider) {
+        chatRef.authWithOAuthPopup(provider, function(error, authData) {
+          if (error) {
+            console.log(error);
+          }
+        });
+      }
     </script>
     <div id='firechat-wrapper'>
-      <a href='#' onclick='auth.login("twitter");'>Login</a>
+      <a href='#' onclick='login("twitter");'>Login</a>
     </div>
   </body>
 </html>
@@ -71,41 +77,43 @@ If you already have authentication built into your application, you can integrat
 
 Firebase provide helper libraries to generate these tokens for various languages, including: [.NET](https://github.com/firebase/firebase-token-generator-dotNet), [Java](https://github.com/firebase/firebase-token-generator-java), [Node.js](https://github.com/firebase/firebase-token-generator-node), [PHP](https://github.com/firebase/firebase-token-generator-php), [Python](https://github.com/firebase/firebase-token-generator-python), [Ruby](https://github.com/firebase/firebase-token-generator-ruby).
 
-Each token should be generated with an `id`:
+Each token should be generated with a `uid`:
 
-  * The `id` is the unique identifier for the user (*string*).
+  * The `uid` is the unique identifier for the user (*string*).
 
 After generating the JWT, authenticate your Firebase reference:
 
 {% highlight javascript %}
-var firechatRef = new Firebase('https://<your-firebase>.firebaseio.com');
-firechatRef.auth(<token>);
+var firechatRef = new Firebase('https://<YOUR-FIREBASE>.firebaseio.com');
+firechatRef.authWithCustomToken(<token>, function(error, authData) {
+  if (error) {
+    console.log(error);
+  }
+});
 {% endhighlight %}
 
-For more information, check out the documentation for [Firebase Custom Login](https://www.firebase.com/docs/security/custom-login.html?utm_source=docs&utm_medium=site&utm_campaign=firechat).
+For more information, check out the documentation for [Firebase Custom Login](https://www.firebase.com/docs/web/guide/login/custom.html?utm_source=docs&utm_medium=site&utm_campaign=firechat).
 
-#### Delegate Authentication to Firebase Simple Login
+#### Delegate Authentication to Firebase
 
-[Firebase Simple Login](https://www.firebase.com/docs/security/simple-login-overview.html?utm_source=docs&utm_medium=site&utm_campaign=firechat) is a built-in service that allows you to authenticate with [Facebook](https://www.firebase.com/docs/security/simple-login-facebook.html?utm_source=docs&utm_medium=site&utm_campaign=firechat), [Twitter](https://www.firebase.com/docs/security/simple-login-twitter.html?utm_source=docs&utm_medium=site&utm_campaign=firechat), [GitHub](https://www.firebase.com/docs/security/simple-login-github.html?utm_source=docs&utm_medium=site&utm_campaign=firechat), [Persona](https://www.firebase.com/docs/security/simple-login-persona.html?utm_source=docs&utm_medium=site&utm_campaign=firechat), or [email / password](https://www.firebase.com/docs/security/simple-login-email-password.html?utm_source=docs&utm_medium=site&utm_campaign=firechat) using only client-side code.
+Firebase has a built-in service that allows you to authenticate with [Facebook](https://www.firebase.com/docs/web/guide/login/facebook.html?utm_source=docs&utm_medium=site&utm_campaign=firechat), [Twitter](https://www.firebase.com/docs/web/guide/login/twitter.html?utm_source=docs&utm_medium=site&utm_campaign=firechat), [GitHub](https://www.firebase.com/docs/web/guide/login/github.html?utm_source=docs&utm_medium=site&utm_campaign=firechat), [Google](https://www.firebase.com/docs/web/guide/login/google.html?utm_source=docs&utm_medium=site&utm_campaign=firechat), or [email / password](https://www.firebase.com/docs/web/guide/login/password.html?utm_source=docs&utm_medium=site&utm_campaign=firechat) using only client-side code.
 
-* To begin, include the Firebase Simple Login script include in your page:
+* To begin, enable your provider of choice in your Firebase account, at `https://<YOUR-FIREBASE>.firebaseio.com`. Social login services may require you to create and configure an application and an authorized origin for the request.
 
-{% highlight html %}
-<script src="https://cdn.firebase.com/js/simple-login/1.6.3/firebase-simple-login.js"></script>
-{% endhighlight %}
-
-* Next, enable your provider of choice in your Firebase account, at `https://<YOUR-FIREBASE>.firebaseio.com`. Social login services may require you to create and configure an application and an authorized origin for the request.
-
-* Lastly, authenticate the user on the client using your provider of choice:
+* Then authenticate the user on the client using your provider of choice:
 
 {% highlight javascript %}
-var firechatRef = new Firebase('https://<your-firebase>.firebaseio.com');
-var auth = new FirebaseSimpleLogin(firechatRef, function(error, user) { ... });
+var firechatRef = new Firebase('https://<YOUR-FIREBASE>.firebaseio.com');
+firechatRef.onAuth(function(authData) { ... });
 ...
-auth.login('twitter'); // or 'facebook', 'github, 'persona', 'password'
+firechatRef.authWithOAuthPopup('twitter' /* or 'facebook', 'github, 'persona', 'password' */, function(error, authData) {
+  if (error) {
+    console.log(error);
+  }
+});
 {% endhighlight %}
 
-For more information, check out the documentation for [Firebase Simple Login](https://www.firebase.com/docs/security/simple-login-overview.html?utm_source=docs&utm_medium=site&utm_campaign=firechat).
+For more information, check out the documentation for [User Authentication](https://www.firebase.com/docs/web/guide/user-auth.html?utm_source=docs&utm_medium=site&utm_campaign=firechat).
 
 
 <a name="customizing"> </a>
