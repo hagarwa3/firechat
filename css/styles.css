@@ -390,13 +390,6 @@ footer {
   height: 200px;
 }
 
-/* Docs: Annotated Source
--------------------------------------------------- */
-.docs-annotated-source-page iframe {
-  width: 100%;
-  min-height: 100%;
-  border: none;
-}
 
 /* Sidenav for Docs
 -------------------------------------------------- */

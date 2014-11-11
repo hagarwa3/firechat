@@ -13,17 +13,52 @@ It is intended to serve as a concise, documented foundation for chat products bu
 <a name="getting_started"> </a>
 ### Getting Started
 
-Firechat works out of the box, provided that you include Firebase and Firechat in your application, and configure it to use your Firebase account.
+Firechat works out of the box, provided that you include the correct dependencies in your
+application, and configure it to use your Firebase account.
 
-#### Prerequisites & Dependencies
 
-Before getting started, you'll need to:
+#### Downloading Firechat
 
-- <a href="https://www.firebase.com/signup/?utm_source=docs&utm_medium=site&utm_campaign=firechat" target="_blank">Create a Firebase account</a> (it's free)
-- [Download Firechat](https://github.com/firebase/firechat/releases/latest)
-- Include [jQuery](http://jquery.com/) (v1.7 or later)
+In order to use Firechat in your project, you need to include the following files in your HTML:
 
-Lastly, ***Firechat requires an authenticated Firebase reference***. Firebase supports authentication with either your own custom authentication system or a number of built-in providers (more on this below).
+{% highlight html %}
+<!-- jQuery -->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+
+<!-- Firebase -->
+<script src='https://cdn.firebase.com/js/client/2.0.2/firebase.js'></script>
+
+<!-- Firechat -->
+<link rel='stylesheet' href='https://cdn.firebase.com/libs/firechat/2.0.1/firechat.min.css' />
+<script src='https://cdn.firebase.com/libs/firechat/2.0.1/firechat.min.js'></script>
+{% endhighlight %}
+
+Use the URLs above to download both the minified and non-minified versions of the Firechat JavaScript
+and CSS files from the Firebase CDN. You can also download them from the
+[releases page of the Firechat GitHub repository](https://github.com/firebase/firechat/releases).
+[Firebase](https://www.firebase.com/docs/web/quickstart.html?utm_source=firechat) and
+[jQuery](https://code.jquery.com/) can be downloaded directly from their respective websites.
+
+You can also install Firechat via npm or Bower and its dependencies will be downloaded
+automatically:
+
+```bash
+$ npm install firechat --save
+```
+
+```bash
+$ bower install firechat --save
+```
+
+#### Getting Started with Firebase
+
+Firechat requires Firebase in order to sync and store data. You can
+[sign up here for a free account](https://www.firebase.com/signup/?utm_medium=web&utm_source=firechat).
+
+
+#### Short Example
+
+***Firechat requires an authenticated Firebase reference***. Firebase supports authentication with either your own custom authentication system or a number of built-in providers (more on this below).
 
 Let's put it all together, using Twitter authentication in our example:
 
@@ -32,12 +67,16 @@ Let's put it all together, using Twitter authentication in our example:
 <html>
   <head>
     <meta charset='utf-8' />
-    <script src='https://cdn.firebase.com/js/client/2.0.2/firebase.js'></script>
+
+    <!-- jQuery -->
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
 
-    <!-- Download from https://github.com/firebase/firechat -->
-    <link rel='stylesheet' href='firechat-default.css' />
-    <script src='firechat-default.js'></script>
+    <!-- Firebase -->
+    <script src='https://cdn.firebase.com/js/client/2.0.2/firebase.js'></script>
+
+    <!-- Firechat -->
+    <link rel='stylesheet' href='https://cdn.firebase.com/libs/firechat/2.0.1/firechat.min.css' />
+    <script src='https://cdn.firebase.com/libs/firechat/2.0.1/firechat.min.js'></script>
   </head>
   <body>
     <script type='text/javascript'>
